@@ -1,0 +1,182 @@
+first thing I did was to open the terminal.
+create a folder (any way you wish) go to that folder by using cd in the terminal 
+and ther use the command >> pipenv install django
+once this is done we open visual studio (or pycharm depending what you use) by 
+>> code .
+
+after that we activate the virtual enviroment by usinng >> pipenv shell
+
+now we are currently working in the virtual enviroment rather than the main terminal
+
+"""
+NOT MANDATORY but good to know that I can use >> django-admin to see every command 
+we can use with django.
+"""
+
+now we need to create our project so we use django-admin startproject PROJECT NAME .
+
+if we check VScode now there is a directory with the name we assigned in the previows
+line, the dot at the end of the line is used so the directory or folder is created in
+our current folder.
+
+from now on instead of using django-admin COMMAND
+we will use python manage.py COMMAND which is a file created when starting the project
+and takes the control of our actions.
+
+so we will run our server by >> python manage.py runserver
+
+we will get an URL, which allows us to see what we are doing 
+most likely this one http://127.0.0.1:8000/ , unless we specify another port 
+e.g:
+
+>> python manage.py runserver 9000 (in case we are running something else in port 8000)
+
+now we will need to work with the terminal of our virtual enviroment rather than the
+main system terminal, so we press ctrl + c in the terminal to interrupt our server
+in vscode we go to view\command pallete (ctrl + shift + p) search for interpreter
+and we insert our virtual enviroment path and add \bin\python at the end
+
+remember that to get our virtual enviroment path we just need to enter 
+>> pipenv --venv in our system terminal 
+
+or just select it from the recommended list in VScode
+
+now we can open the terminal in VScode and run the server again 
+>> python manage.py runserver
+***********************************************************************************
+All the previows steps were related to prepare everything to work, so now that
+we are ready, we can create an app from our virtual enviroment terminal
+
+>> python mange.py startapp APP´S NAME
+
+if we go to the main folder now a new directory has been created (APP´S NAME)
+the next thing to do is always to register our new app in the settings module, in
+order to do that we have to open the settings.py file (located in the folder we 
+created when using >> django-admin startproject PROJECT NAME .)
+
+once we are there, will be necesary to write the name of the app in 
+the instaled apps section (just copy the fromat of the default apps)
+
+********************************************************************************
+Views.py
+that file is a requests handler which allows us to get a request and give a response,
+the requests here are of the http type.
+so in this case we will go to the app´s we just created folder, open the views.py
+module, and we have to know that everytime we created a view, it will be just a function
+this functions need a request as an argument, so they will look something like this:
+
+from django.http import HttpResponse
+
+def my_function(request):
+	    return HttpResponse("Keep learning :")
+
+
+We can return whatever we want but for this exercise we just return an instance from
+the HttpResponse class with a string.
+
+the next thing is to map that request to an url, so whenever we request that url
+it will call the view (function) we just created.
+
+to do that we have to go to our NEW APP folder and create a file call urls.py (by convention)
+is in this new module where we will map our urls to our functions (the ones in the view.py file of our new app).
+
+to do it we´ll do the following:
+
+- Import some modules (path and the views.py module located in the current folder)
+- Create a reserved variable calls urlpatterns (DO NOT MISS SPELL IT CAUSE THAT IS WHAT 
+  DJANGO LOOKS FOR WHEN MAPPING), wich will store an array with different urlpatter objects.
+- Inside the array we storage the urls and pass the function to map to that speciffic
+  url (from the viws.py module) by using the path function (wich we previously imported)
+ 
+  path('my_url', view.function_to_map)
+
+
+The file should look something like this:
+
+from django.urls.py import path
+from . import views
+
+# This is call URL CONFIGURATION
+urlpatterns = [
+    path('playground\hello', views.say_hello) # the function is not call but pass as a reference
+]
+
+
+now that we maped the view or function to our url, we have to inform our main app
+about this (or main url configuration), so we go to the project main folder, open the
+urls.py module and add some lines to the file.
+
+first thing to do is to import the include function (we can get the instruccions of how
+to do it from the file itself) and add the new path to the current urlpatterns array.
+
+it should look something like this:
+
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('my_url\', include('my_new_app.urls')) 
+   # Every url that start with my_url followed by / 
+     should be routed to my_neww_app.urls
+]
+
+
+**********************************************************************************
+now we are ready to create templates (html files) which will be seen be the user
+
+to do that we go to our new_app folder and create a new directory call templates
+is in this directory where we will store our html files, so go and add some html file
+
+now to return a html file we need to go to our views.py file and in the function we want to
+return we will use the render function,
+
+Do not forget to map this request so whenever we request that url it will call the view (urls.py)
+
+It should look like this:
+
+from.django.shortcuts import render
+from.django.http import HttpResponse
+
+def my_function(request):
+	return render(request, 'my_html_file.html')
+
+********************************************************************************
+Debug a python file
+go to the debug icon, select cre4ate json file and from the search bar select django, once the file
+has been created, (launch.json), open the file and under runserve, add another por to avoid clashes 
+with our server port.
+
+now we are ready to debug, the breakpoit is the point where our program stops running automatically and starts running
+line by line
+
+I WILL INSTALL PYTHON DEBUG BAR:
+go to the terminal and type pipenv install django-debug-toolbar
+next we need to add the bar to our apps just as we did before, go to installed apps in our 
+settings.py module(main folder), so enter 'debug_toolbar'
+
+now add the url to our urls module in the main folder, should look like this
+
+import debug_toolbar
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('playground/', include('playground.urls')),
+    path('__debug__/', include(debug_toolbar.urls))
+]
+
+next we have to add a middleware into the middleware section inside the settings.py module (main folder)
+'debug_toolbar.middleware.DebugToolbarMiddleware'
+
+A middleware is in charge of the request response django process ----> DONT GET THIS, CHECK IN THE FUTURE
+
+and finally we add a setting call 
+INTERNAL_IPS = [
+  # ...
+    '127.0.0.1',
+  # ...
+]
+
+Now a toolbar is shown anytime we request an html
+
+ 
